@@ -1,0 +1,63 @@
+
+// for uint32_t write and read
+
+#define FLASH_SECTOR_7  7                 // Sector 7 of STM32F401
+#define EEPROM_START_ADDRESS  0x08050000  // Start address of sector
+
+
+void Flash_EraseSector(void) {
+    HAL_FLASH_Unlock();
+
+    FLASH_Erase_Sector(FLASH_SECTOR_7, VOLTAGE_RANGE_3);
+
+    HAL_FLASH_Lock();
+}
+
+void Flash_WriteData(uint32_t address, uint32_t data) {
+    HAL_FLASH_Unlock();
+
+    HAL_FLASH_Program(TYPEPROGRAM_WORD, address, data);
+
+    HAL_FLASH_Lock();
+}
+
+uint32_t Flash_ReadData(uint32_t address) {
+    return *(__IO uint32_t *)address;
+}
+
+void EEPROM_Write(uint32_t address, uint32_t data) {
+    Flash_EraseSector();
+    Flash_WriteData(address, data);
+}
+
+uint32_t EEPROM_Read(uint32_t address) {
+    return Flash_ReadData(address);
+}
+
+
+
+int main(void)
+{
+// your initi code
+
+  /* USER CODE BEGIN 1 */
+  
+  uint32_t dataToWrite = 0x12345678;
+  uint32_t readData;
+
+  EEPROM_Write(EEPROM_START_ADDRESS, dataToWrite);
+  readData = EEPROM_Read(EEPROM_START_ADDRESS);
+
+  // Check if the data was written and read correctly
+  if (readData == dataToWrite) {
+         // Data successfully written and read
+   } else {
+        // Error
+   }
+
+  /* USER CODE END 1 */
+
+// your rest of the code
+
+}
+
